@@ -76,7 +76,8 @@
 <body>
 
 <main>
-    <h1>AppMakers Clipboard Reader</h1>
+    <h3>The App Makers</h3>
+    <h1>Clipboard Reader</h1>
     <p>Click on a box to copy the text again</p>
 
     <ul class="text-list"></ul>
@@ -137,15 +138,22 @@
     }
 
     function readClipBoard() {
-        navigator.clipboard.readText().then(
-            clipText => {
-                if (!items.includes(clipText)) {
-                    appendItem(clipText);
-                    items.unshift(clipText);
-                    saveItems(items);
-                }
-            }
-        );
+        const clipText = window.clipboard.readText();
+        if (!items.includes(clipText)) {
+            appendItem(clipText);
+            items.unshift(clipText);
+            saveItems(items);
+        }
+
+        // navigator.clipboard.readText().then(
+        //     clipText => {
+        //         if (!items.includes(clipText)) {
+        //             appendItem(clipText);
+        //             items.unshift(clipText);
+        //             saveItems(items);
+        //         }
+        //     }
+        // );
     }
 
     let items = getItems();

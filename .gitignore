@@ -29,5 +29,7 @@ npm-debug.log*
 /platforms
 /plugins
 /www
+/release-builds
+/builds
 !platforms/android/app/src/main/AndroidManifest.xml
 *.apk
