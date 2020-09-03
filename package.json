@@ -1,0 +1,15 @@
+{
+    "name": "apm-clipboard-reader",
+    "version": "1.0.0",
+    "description": "Clipboard Reader by The App Makers",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "devDependencies": {
+        "electron": "^10.1.1",
+        "electron-packager": "^15.1.0"
+    },
+    "author": "Naveed Hassan",
+    "license": "ISC"
+}

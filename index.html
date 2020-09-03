@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AppMakers Clipboard Reader</title>
+    <style>
+        html, body {
+            font-size: 20px;
+        }
+
+        main {
+            max-width: 600px;
+            margin: auto;
+            font-family: "Calibri Light", SansSerif, Serif, serif;
+        }
+
+        .text-list {
+            padding: 0;
+        }
+
+        .item {
+            list-style: none;
+            padding: 0.5rem;
+            display: flex;
+        }
+
+        .item-text {
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .delete-btn {
+            cursor: pointer;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+            border-radius: 50%;
+            font-weight: 800;
+            color: #999;
+            font-size: 0.7rem;
+            transition: transform 500ms;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.5);
+        }
+
+        .item:hover {
+            background-color: #eee !important;
+        }
+
+        .item:nth-child(2n) {
+            background-color: #efe;
+        }
+
+        div.copied {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 200px;
+            text-align: center;
+            color: #3c763d;
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-left: -100px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <h1>AppMakers Clipboard Reader</h1>
+    <p>Click on a box to copy the text again</p>
+
+    <ul class="text-list"></ul>
+</main>
+
+<script>
+    function copyText(text) {
+        let copyFrom = document.createElement('textarea');
+        copyFrom.setAttribute("style", "position:fixed;opacity:0;top:100px;left:100px;");
+        copyFrom.value = text;
+        document.body.appendChild(copyFrom);
+        copyFrom.select();
+        document.execCommand('copy');
+        let copied = document.createElement('div');
+        copied.setAttribute('class', 'copied');
+        copied.appendChild(document.createTextNode('Copied: ' + text));
+        document.body.appendChild(copied);
+        setTimeout(function () {
+            document.body.removeChild(copyFrom);
+            document.body.removeChild(copied);
+        }, 1500);
+    }
+
+    function removeItem(element, text) {
+        items.splice(items.indexOf(text), 1);
+        saveItems(items);
+        document.querySelector(".text-list").removeChild(element);
+    }
+
+    function getItems() {
+        let items = localStorage.getItem('clipboard-items');
+        if (items) return JSON.parse(items);
+        return [];
+    }
+
+    function saveItems(items) {
+        localStorage.setItem('clipboard-items', JSON.stringify(items));
+    }
+
+    function appendItem(text) {
+        let element = document.createElement('li');
+        element.classList.add('item');
+
+        let itemText = document.createElement('div');
+        itemText.classList.add('item-text');
+        itemText.innerText = text;
+
+        let deleteBtn = document.createElement("div");
+        deleteBtn.classList.add('delete-btn');
+        deleteBtn.innerHTML = "<span>❌</span>";
+
+        element.appendChild(itemText);
+        element.appendChild(deleteBtn);
+        document.querySelector(".text-list").prepend(element);
+
+        itemText.onclick = () => copyText(text);
+        deleteBtn.onclick = () => removeItem(element, text);
+    }
+
+    function readClipBoard() {
+        navigator.clipboard.readText().then(
+            clipText => {
+                if (!items.includes(clipText)) {
+                    appendItem(clipText);
+                    items.unshift(clipText);
+                    saveItems(items);
+                }
+            }
+        );
+    }
+
+    let items = getItems();
+
+    for (const item of items) {
+        appendItem(item);
+    }
+
+    setInterval(readClipBoard, 1000);
+
+</script>
+
+</body>
+</html>
