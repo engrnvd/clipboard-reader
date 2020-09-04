@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow} = require('electron');
 
 let win;
 
@@ -16,8 +16,9 @@ function createWindow() {
 
     win.loadURL(`file://${__dirname}/index.html`);
 
-    // uncomment below to open the DevTools.
-    // win.webContents.openDevTools();
+    if (process.env.NODE_ENV === 'dev') {
+        win.webContents.openDevTools();
+    }
 
     // Event when the window is closed.
     win.on('closed', function () {
@@ -38,6 +39,8 @@ app.on('activate', function () {
     }
 })
 
-// require('electron-reload')(__dirname, {
-//     electron: require(`${__dirname}/node_modules/electron`)
-// });
+if (process.env.NODE_ENV === 'dev') {
+    require('electron-reload')(__dirname, {
+        electron: require(`${__dirname}/node_modules/electron`)
+    });
+}
