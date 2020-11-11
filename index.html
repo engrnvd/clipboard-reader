@@ -34,7 +34,12 @@
             <div class="mdc-data-table__table-container">
                 <table class="mdc-data-table__table" aria-label="Items">
                     <tr class="mdc-data-table__row" v-for="item in items">
-                        <th class="mdc-data-table__cell" scope="row">
+                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" style="vertical-align: top">
+                            <button class="mdc-icon-button material-icons text-danger" @click="removeItem(item)">
+                                delete
+                            </button>
+                        </td>
+                        <td class="mdc-data-table__cell" scope="row">
                             <div class="mdc-chip" role="row" @click="copyText(item)">
                                 <div class="mdc-chip__ripple"></div>
                                 <span role="gridcell">
@@ -43,11 +48,6 @@
                                   </span>
                                 </span>
                             </div>
-                        </th>
-                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                            <button class="mdc-icon-button material-icons text-danger" @click="removeItem(item)">
-                                delete
-                            </button>
                         </td>
                     </tr>
                 </table>
