@@ -1,32 +1,7 @@
 const {app, BrowserWindow, globalShortcut, clipboard, ipcMain} = require('electron');
 
-let mainWindow
 let clipWindow
 let previouslyFocusedApp = null
-
-function createWindow() {
-    // Create the browser window.
-    mainWindow = new BrowserWindow({
-        width: 1080,
-        height: 720,
-        backgroundColor: '#ffffff',
-        icon: `file://${__dirname}/assets/icon.png`,
-        webPreferences: {
-            preload: `${__dirname}/preload.js`
-        }
-    });
-
-    mainWindow.loadURL(`file://${__dirname}/index.html`);
-
-    if (process.env.NODE_ENV === 'dev') {
-        mainWindow.webContents.openDevTools();
-    }
-
-    // Event when the window is closed.
-    mainWindow.on('closed', function () {
-        mainWindow = null
-    });
-}
 
 function createClipWindow() {
     clipWindow = new BrowserWindow({
@@ -42,7 +17,7 @@ function createClipWindow() {
         }
     })
 
-    clipWindow.loadFile('clip.html')
+    clipWindow.loadFile('index.html')
 
     clipWindow.on('ready-to-show', () => {
         // Center the window
@@ -55,7 +30,6 @@ function createClipWindow() {
 }
 
 app.whenReady().then(() => {
-    createWindow()
     createClipWindow()
 
     // Register global shortcut
@@ -79,14 +53,9 @@ app.whenReady().then(() => {
         clipWindow.show()
         clipWindow.focus()
     })
-
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow()
-    })
 })
 // Handle item selection
 ipcMain.on('paste-item', (_, text) => {
-    console.log({text})
     clipWindow.hide()
     clipboard.writeText(text)
 
@@ -118,13 +87,6 @@ ipcMain.on('paste-item', (_, text) => {
 
 app.on('window-all-closed', function () {
     app.quit();
-})
-
-app.on('activate', function () {
-    // macOS specific close process
-    if (mainWindow === null) {
-        createWindow();
-    }
 })
 
 if (process.env.NODE_ENV === 'dev') {
