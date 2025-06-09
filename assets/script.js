@@ -23,7 +23,7 @@ const app = new Vue({
                     this.pasteItem()
                     break
                 case 'Escape':
-                    window.close()
+                    window.electronAPI.hideWindow()
                     break
                 case 'Delete':
                     this.removeItem(this.selectedItem)
@@ -67,7 +67,7 @@ const app = new Vue({
             this.selectedItem = this.items[idx]
         },
         pasteItem(item = null) {
-            window.electronAPI.sendItem(item || this.selectedItem)
+            window.electronAPI.pasteItem(item || this.selectedItem)
         },
     },
     mounted() {

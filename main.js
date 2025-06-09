@@ -55,7 +55,7 @@ app.whenReady().then(() => {
     })
 })
 // Handle item selection
-ipcMain.on('paste-item', (_, text) => {
+ipcMain.on('pasteItem', (_, text) => {
     clipWindow.hide()
     clipboard.writeText(text)
 
@@ -84,6 +84,8 @@ ipcMain.on('paste-item', (_, text) => {
         }
     }, 100)
 })
+
+ipcMain.on('hideWindow', clipWindow.hide)
 
 app.on('window-all-closed', function () {
     app.quit();
