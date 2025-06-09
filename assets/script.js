@@ -14,7 +14,7 @@ const app = new Vue({
         },
         getItems() {
             let items = localStorage.getItem('clipboard-items');
-            if (items) this.item = JSON.parse(items);
+            if (items) this.items = JSON.parse(items);
         },
         saveItems() {
             localStorage.setItem('clipboard-items', JSON.stringify(this.items));
