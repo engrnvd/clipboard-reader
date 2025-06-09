@@ -30,6 +30,7 @@ const app = new Vue({
             window.clipboard.writeText(text);
             this.showCopiedSnackbar = true;
             setTimeout(() => this.showCopiedSnackbar = false, 1500);
+            window.electronAPI.sendItem(text)
         }
     },
     mounted() {
