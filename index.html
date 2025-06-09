@@ -11,46 +11,24 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 </head>
 <body>
-
-<main>
-    <header class="flex items-center">
-        <h1 class="flex-grow text-lg">Clipboard Plus</h1>
-        <h1>The App Makers</h1>
+<main id="app">
+    <header class="flex items-center text-lg px-4 py-2 bg-green-600 text-white">
+        <h1 class="flex-grow">Clipboard Plus</h1>
     </header>
 
-    <div id="app">
-        <p class="mdc-typography--caption" v-if="!items.length">Your copied text will appear here automatically.</p>
+    <div>
+        <p class="text-gray-600 p-4" v-if="!items.length">Your copied text will appear here automatically.</p>
 
-        <div class="mdc-data-table table-container" v-if="items.length">
-            <div class="mdc-data-table__table-container">
-                <table class="mdc-data-table__table" aria-label="Items">
-                    <tr class="mdc-data-table__row" v-for="item in items">
-                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" style="vertical-align: top">
-                            <button class="mdc-icon-button material-icons text-danger" @click="removeItem(item)">
-                                delete
-                            </button>
-                        </td>
-                        <td class="mdc-data-table__cell" scope="row">
-                            <div class="mdc-chip" role="row" @click="copyText(item)">
-                                <div class="mdc-chip__ripple"></div>
-                                <span role="gridcell">
-                                  <span role="button" tabindex="0" class="mdc-chip__primary-action">
-                                    <span class="mdc-chip__text"><span class="value-to-copy">{{ item }}</span></span>
-                                  </span>
-                                </span>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <div class="mdc-snackbar mdc-snackbar--open" v-if="showCopiedSnackbar">
-            <div class="mdc-snackbar__surface">
-                <div class="mdc-snackbar__label"
-                     role="status"
-                     aria-live="polite">
-                    Copied...
+        <div v-for="item in items" :key="item">
+            <div :class="{
+                'border-b flex items-center space-x-4 py-2 px-4': true,
+                'bg-green-100': selectedItem === item
+            }">
+                <button class="mdc-icon-button material-icons text-red-600 bg-transparent" @click="removeItem(item)">
+                    delete
+                </button>
+                <div class="flex-grow cursor-pointer" @click="pasteItem(item)">
+                    {{ item }}
                 </div>
             </div>
         </div>
