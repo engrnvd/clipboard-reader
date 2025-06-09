@@ -29,8 +29,48 @@ function createClipWindow() {
     clipWindow.on('blur', () => clipWindow.hide())
 }
 
-app.whenReady().then(() => {
+async function checkAccessibilityPermissions() {
+    const os = require('os')
+    if (os.platform() === 'darwin') {
+        const { execSync } = require('child_process')
+        try {
+            // Test if we have accessibility permissions
+            execSync('osascript -e "tell application \\"System Events\\" to keystroke \\"v\\" using command down"', { encoding: 'utf8' })
+            return true
+        } catch (error) {
+            await showPermissionsDialog()
+        }
+    }
+    return true
+}
+
+async function showPermissionsDialog() {
+    const { dialog } = require('electron')
+    const { execSync } = require('child_process')
+
+    const result = await dialog.showMessageBox({
+        type: 'warning',
+        title: 'Accessibility Permissions Required',
+        message: 'This app needs accessibility permissions to paste text automatically.',
+        detail: 'Please go to System Preferences → Security & Privacy → Privacy → Accessibility and add Clipboard Plus to the list.',
+        buttons: ['Open System Preferences', 'Continue Without Auto-Paste', 'Quit'],
+        defaultId: 0
+    })
+
+    if (result.response === 0) {
+        // Open System Preferences
+        execSync('open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"')
+    } else if (result.response === 2) {
+        app.quit()
+        return false
+    }
+    return false
+}
+
+app.whenReady().then(async () => {
     createClipWindow()
+
+    await checkAccessibilityPermissions()
 
     // Register global shortcut
     globalShortcut.register('Shift+CommandOrControl+V', (e) => {
@@ -80,12 +120,15 @@ ipcMain.on('pasteItem', (_, text) => {
                 }
             } catch (error) {
                 console.error('Paste error:', error)
+                showPermissionsDialog()
             }
         }
     }, 100)
 })
 
-ipcMain.on('hideWindow', clipWindow.hide)
+ipcMain.on('hideWindow', () => {
+    clipWindow.hide()
+})
 
 app.on('window-all-closed', function () {
     app.quit();
