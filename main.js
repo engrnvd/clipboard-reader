@@ -6,7 +6,7 @@ let clipWindow
 let previouslyFocusedApp = null
 let targetDisplay = null // Store the display where the focused app was
 const windowWidth = 450
-const windowHeight = 710
+const windowHeight = 760
 
 function createClipWindow() {
     clipWindow = new BrowserWindow({
