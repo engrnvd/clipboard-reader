@@ -1,12 +1,17 @@
-const {app, BrowserWindow, globalShortcut, clipboard, ipcMain} = require('electron');
+const {app, BrowserWindow, globalShortcut, clipboard, ipcMain, screen } = require('electron');
 
 let clipWindow
 let previouslyFocusedApp = null
+let targetDisplay = null // Store the display where the focused app was
 
 function createClipWindow() {
+    const { screen } = require('electron')
+    const primaryDisplay = screen.getPrimaryDisplay()
+    const { height: screenHeight } = primaryDisplay.workAreaSize
+
     clipWindow = new BrowserWindow({
         width: 400,
-        height: 300,
+        height: screenHeight - 100,
         alwaysOnTop: true,
         frame: false,
         show: false,
@@ -27,6 +32,32 @@ function createClipWindow() {
 
     // Hide when window loses focus
     clipWindow.on('blur', () => clipWindow.hide())
+}
+
+function positionClipboardWindow() {
+    if (!clipWindow) return
+
+    const { screen } = require('electron')
+
+    // Use target display if available, otherwise use primary display
+    const display = targetDisplay || screen.getPrimaryDisplay()
+    const { width: screenWidth, height: screenHeight, x: screenX, y: screenY } = display.workArea
+
+    const windowWidth = 400
+    const windowHeight = screenHeight - 100
+
+    // Center the window on the target screen
+    const x = screenX + Math.round((screenWidth - windowWidth) / 2)
+    const y = screenY + Math.round((screenHeight - windowHeight) / 2)
+
+    clipWindow.setBounds({
+        x: x,
+        y: y,
+        width: windowWidth,
+        height: windowHeight
+    })
+
+    console.log(`Positioned clipboard window at ${x}, ${y} on display ${display.id}`)
 }
 
 async function checkAccessibilityPermissions() {
@@ -74,6 +105,10 @@ app.whenReady().then(async () => {
 
     // Register global shortcut
     globalShortcut.register('Shift+CommandOrControl+V', (e) => {
+        const { screen } = require('electron')
+        const cursorPoint = screen.getCursorScreenPoint()
+        targetDisplay = screen.getDisplayNearestPoint(cursorPoint)
+
         // Store the currently focused application before showing our window
         const { execSync } = require('child_process')
         const os = require('os')
@@ -89,11 +124,15 @@ app.whenReady().then(async () => {
             }
         }
 
-        if (clipWindow.isDestroyed()) createClipWindow()
+        if (!clipWindow) createClipWindow()
+        else positionClipboardWindow()
+        positionClipboardWindow()
+
         clipWindow.show()
         clipWindow.focus()
     })
 })
+
 // Handle item selection
 ipcMain.on('pasteItem', (_, text) => {
     clipWindow.hide()

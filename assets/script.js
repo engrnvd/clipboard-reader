@@ -26,8 +26,9 @@ const app = new Vue({
                     window.electronAPI.hideWindow()
                     break
                 case 'Delete':
+                    const idx = this.selectedIdx
                     this.removeItem(this.selectedItem)
-                    this.selectNext()
+                    this.selectItem(this.items[idx] || this.items[0])
                     break
             }
         },
@@ -37,14 +38,16 @@ const app = new Vue({
                 this.items.unshift(clipText);
                 this.saveItems();
             }
+
         },
         getItems() {
             let items = localStorage.getItem('clipboard-items')
             if (items) this.items = JSON.parse(items)
-            if (!this.selectedItem) this.selectedItem = this.items[0]
+
+            if (!this.selectedItem || !this.items.includes(this.selectedItem)) this.selectedItem = this.items[0]
         },
         saveItems() {
-            localStorage.setItem('clipboard-items', JSON.stringify(this.items));
+            localStorage.setItem('clipboard-items', JSON.stringify(this.items.slice(20)));
         },
         removeItem(text) {
             this.items.splice(this.items.indexOf(text), 1);
@@ -53,18 +56,18 @@ const app = new Vue({
             const clipText = window.clipboard.readText();
             if (clipText === text) window.clipboard.clear();
         },
-        selectItem(text) {
-            this.selectedItem = text
+        selectItem(item) {
+            this.selectedItem = item
         },
         selectNext() {
             let idx = this.selectedIdx + 1
             if (idx >= this.items.length) idx = 0
-            this.selectedItem = this.items[idx]
+            this.selectItem(this.items[idx])
         },
         selectPrevious() {
             let idx = this.selectedIdx - 1
             if (idx < 0) idx = this.items.length - 1
-            this.selectedItem = this.items[idx]
+            this.selectItem(this.items[idx])
         },
         pasteItem(item = null) {
             window.electronAPI.pasteItem(item || this.selectedItem)
