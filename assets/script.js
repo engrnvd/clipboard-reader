@@ -36,9 +36,9 @@ const app = new Vue({
             const clipText = window.clipboard.readText();
             if (clipText && !this.items.includes(clipText)) {
                 this.items.unshift(clipText);
+                this.items = this.items.slice(0, 20)
                 this.saveItems();
             }
-
         },
         getItems() {
             let items = localStorage.getItem('clipboard-items')
@@ -47,7 +47,7 @@ const app = new Vue({
             if (!this.selectedItem || !this.items.includes(this.selectedItem)) this.selectedItem = this.items[0]
         },
         saveItems() {
-            localStorage.setItem('clipboard-items', JSON.stringify(this.items.slice(20)));
+            localStorage.setItem('clipboard-items', JSON.stringify(this.items));
         },
         removeItem(text) {
             this.items.splice(this.items.indexOf(text), 1);

@@ -5,8 +5,8 @@
     "main": "main.js",
     "scripts": {
         "start": "NODE_ENV=dev electron .",
-        "mac-release": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icon.icns --prune=true --out=release-builds",
-        "windows-release": "electron-packager . clipboard-plus --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icon.ico --prune=true --out=release-builds --version-string.CompanyName=AppMakers --version-string.FileDescription=AppMakers --version-string.ProductName='Clipboard Plus'",
+        "mac-release": "electron-packager . 'Clipboard Plus' --overwrite --platform=darwin --arch=x64 --icon=assets/icon.icns --prune=true --out=release-builds",
+        "windows-release": "electron-packager . 'Clipboard Plus' --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icon.ico --prune=true --out=release-builds --version-string.CompanyName=AppMakers --version-string.FileDescription=AppMakers --version-string.ProductName='Clipboard Plus'",
         "linux-release": "electron-packager . clipboard-plus --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icon.png --prune=true --out=release-builds",
         "mac-build": "electron-installer-dmg ./release-builds/clipboard-plus-darwin-x64/clipboard-plus.app builds/clipboard-plus",
         "windows-build": "node windows-build.js"

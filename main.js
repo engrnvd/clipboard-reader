@@ -3,18 +3,13 @@ const {app, BrowserWindow, globalShortcut, clipboard, ipcMain, screen } = requir
 let clipWindow
 let previouslyFocusedApp = null
 let targetDisplay = null // Store the display where the focused app was
-
-const windowWidth = 500
-const paddingY = 200
+const windowWidth = 450
+const windowHeight = 710
 
 function createClipWindow() {
-    const { screen } = require('electron')
-    const primaryDisplay = screen.getPrimaryDisplay()
-    const { height: screenHeight } = primaryDisplay.workAreaSize
-
     clipWindow = new BrowserWindow({
         width: windowWidth,
-        height: screenHeight - paddingY,
+        height: windowHeight,
         alwaysOnTop: true,
         frame: false,
         show: false,
@@ -46,8 +41,6 @@ function positionClipboardWindow() {
     const display = targetDisplay || screen.getPrimaryDisplay()
     const { width: screenWidth, height: screenHeight, x: screenX, y: screenY } = display.workArea
 
-    const windowHeight = screenHeight - paddingY
-
     // Center the window on the target screen
     const x = screenX + Math.round((screenWidth - windowWidth) / 2)
     const y = screenY + Math.round((screenHeight - windowHeight) / 2)
@@ -55,8 +48,6 @@ function positionClipboardWindow() {
     clipWindow.setBounds({
         x: x,
         y: y,
-        width: windowWidth,
-        height: windowHeight
     })
 
     console.log(`Positioned clipboard window at ${x}, ${y} on display ${display.id}`)
@@ -111,7 +102,6 @@ app.whenReady().then(async () => {
 
         if (!clipWindow) createClipWindow()
         else positionClipboardWindow()
-        positionClipboardWindow()
 
         clipWindow.show()
         clipWindow.focus()
