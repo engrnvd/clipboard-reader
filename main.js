@@ -1,4 +1,6 @@
-const {app, BrowserWindow, globalShortcut, clipboard, ipcMain, screen } = require('electron');
+const {app, BrowserWindow, globalShortcut, clipboard, ipcMain, screen, dialog } = require('electron')
+const { execSync } = require('child_process')
+const os = require('os')
 
 let clipWindow
 let previouslyFocusedApp = null
@@ -35,8 +37,6 @@ function createClipWindow() {
 function positionClipboardWindow() {
     if (!clipWindow) return
 
-    const { screen } = require('electron')
-
     // Use target display if available, otherwise use primary display
     const display = targetDisplay || screen.getPrimaryDisplay()
     const { width: screenWidth, height: screenHeight, x: screenX, y: screenY } = display.workArea
@@ -49,14 +49,9 @@ function positionClipboardWindow() {
         x: x,
         y: y,
     })
-
-    console.log(`Positioned clipboard window at ${x}, ${y} on display ${display.id}`)
 }
 
 async function showPermissionsDialog() {
-    const { dialog } = require('electron')
-    const { execSync } = require('child_process')
-
     const result = await dialog.showMessageBox({
         type: 'warning',
         title: 'Accessibility Permissions Required',
@@ -66,8 +61,7 @@ async function showPermissionsDialog() {
         defaultId: 0
     })
 
-    if (result.response === 0) {
-        // Open System Preferences
+    if (result.response === 0) { // Open System Preferences
         execSync('open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"')
     } else if (result.response === 2) {
         app.quit()
@@ -79,22 +73,15 @@ async function showPermissionsDialog() {
 app.whenReady().then(async () => {
     createClipWindow()
 
-    // Register global shortcut
     globalShortcut.register('Shift+CommandOrControl+V', (e) => {
-        const { screen } = require('electron')
         const cursorPoint = screen.getCursorScreenPoint()
         targetDisplay = screen.getDisplayNearestPoint(cursorPoint)
 
         // Store the currently focused application before showing our window
-        const { execSync } = require('child_process')
-        const os = require('os')
-
         if (os.platform() === 'darwin') {
             try {
-                // Get the frontmost application
                 const result = execSync('osascript -e "tell application \\"System Events\\" to get name of first application process whose frontmost is true"', { encoding: 'utf8' })
                 previouslyFocusedApp = result.trim()
-                console.log('Previously focused app:', previouslyFocusedApp)
             } catch (error) {
                 console.error('Could not get focused app:', error)
             }
@@ -114,18 +101,11 @@ ipcMain.on('pasteItem', (_, text) => {
     clipboard.writeText(text)
 
     setTimeout(() => {
-        const { execSync } = require('child_process')
-        const os = require('os')
-
         if (os.platform() === 'darwin') {
             try {
-                // First, activate the previously focused application
                 if (previouslyFocusedApp) {
                     execSync(`osascript -e "tell application \\"${previouslyFocusedApp}\\" to activate"`)
-
-                    // Small delay to ensure app is activated
                     setTimeout(() => {
-                        // Now paste the content
                         execSync('osascript -e "tell application \\"System Events\\" to keystroke \\"v\\" using command down"')
                     }, 100)
                 } else {

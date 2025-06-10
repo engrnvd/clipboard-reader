@@ -11,7 +11,6 @@ const app = new Vue({
     },
     methods: {
         keydown(e) {
-            console.log(e)
             switch (e.key) {
                 case 'ArrowUp':
                     this.selectPrevious()
