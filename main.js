@@ -4,14 +4,17 @@ let clipWindow
 let previouslyFocusedApp = null
 let targetDisplay = null // Store the display where the focused app was
 
+const windowWidth = 500
+const paddingY = 200
+
 function createClipWindow() {
     const { screen } = require('electron')
     const primaryDisplay = screen.getPrimaryDisplay()
     const { height: screenHeight } = primaryDisplay.workAreaSize
 
     clipWindow = new BrowserWindow({
-        width: 400,
-        height: screenHeight - 100,
+        width: windowWidth,
+        height: screenHeight - paddingY,
         alwaysOnTop: true,
         frame: false,
         show: false,
@@ -43,8 +46,7 @@ function positionClipboardWindow() {
     const display = targetDisplay || screen.getPrimaryDisplay()
     const { width: screenWidth, height: screenHeight, x: screenX, y: screenY } = display.workArea
 
-    const windowWidth = 400
-    const windowHeight = screenHeight - 100
+    const windowHeight = screenHeight - paddingY
 
     // Center the window on the target screen
     const x = screenX + Math.round((screenWidth - windowWidth) / 2)
@@ -58,21 +60,6 @@ function positionClipboardWindow() {
     })
 
     console.log(`Positioned clipboard window at ${x}, ${y} on display ${display.id}`)
-}
-
-async function checkAccessibilityPermissions() {
-    const os = require('os')
-    if (os.platform() === 'darwin') {
-        const { execSync } = require('child_process')
-        try {
-            // Test if we have accessibility permissions
-            execSync('osascript -e "tell application \\"System Events\\" to keystroke \\"v\\" using command down"', { encoding: 'utf8' })
-            return true
-        } catch (error) {
-            await showPermissionsDialog()
-        }
-    }
-    return true
 }
 
 async function showPermissionsDialog() {
@@ -100,8 +87,6 @@ async function showPermissionsDialog() {
 
 app.whenReady().then(async () => {
     createClipWindow()
-
-    await checkAccessibilityPermissions()
 
     // Register global shortcut
     globalShortcut.register('Shift+CommandOrControl+V', (e) => {
