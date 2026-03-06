@@ -2,6 +2,8 @@
 
 A lightweight productivity application that supercharges your clipboard. Never lose copied text again!
 
+![Preview](assets/cbp.png)
+
 Clipboard Plus automatically remembers everything you copy and presents it in an easy-to-navigate list. Quickly access your copy history with keyboard shortcuts and manage important items by pinning them.
 
 ## Features
