@@ -1,4 +1,9 @@
 const {app, BrowserWindow, globalShortcut, clipboard, ipcMain, screen, dialog } = require('electron')
+
+app.commandLine.appendSwitch('disable-gpu')
+app.commandLine.appendSwitch('no-sandbox')
+app.commandLine.appendSwitch('disable-software-rasterizer')
+app.commandLine.appendSwitch('in-process-gpu')
 const { execSync } = require('child_process')
 const os = require('os')
 
@@ -16,6 +21,7 @@ function createClipWindow() {
         alwaysOnTop: true,
         frame: false,
         show: false,
+        icon: `${__dirname}/assets/icon.png`,
         webPreferences: {
             nodeIntegration: true,
             preload: `${__dirname}/preload.js`,
