@@ -4,6 +4,7 @@ const os = require('os')
 
 let clipWindow
 let previouslyFocusedApp = null
+let previouslyFocusedWindow = null // Linux: xdotool window ID
 let targetDisplay = null // Store the display where the focused app was
 const windowWidth = 450
 const windowHeight = 760
@@ -85,6 +86,12 @@ app.whenReady().then(async () => {
             } catch (error) {
                 console.error('Could not get focused app:', error)
             }
+        } else if (os.platform() === 'linux') {
+            try {
+                previouslyFocusedWindow = execSync('xdotool getactivewindow', { encoding: 'utf8' }).trim()
+            } catch (error) {
+                console.error('Could not get focused window:', error)
+            }
         }
 
         if (!clipWindow) createClipWindow()
@@ -115,6 +122,15 @@ ipcMain.on('pasteItem', (_, text) => {
             } catch (error) {
                 console.error('Paste error:', error)
                 showPermissionsDialog()
+            }
+        } else if (os.platform() === 'linux') {
+            try {
+                if (previouslyFocusedWindow) {
+                    execSync(`xdotool windowfocus --sync ${previouslyFocusedWindow}`)
+                    execSync(`xdotool key --window ${previouslyFocusedWindow} ctrl+v`)
+                }
+            } catch (error) {
+                console.error('Paste error:', error)
             }
         }
     }, 100)
