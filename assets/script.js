@@ -37,14 +37,14 @@ const app = new Vue({
                     this.selectNextItem()
                     break
                 case 'ArrowLeft':
-                    if (e.metaKey) {
+                    if (e.metaKey || e.ctrlKey) {
                         this.selectedItem.pinned = false
                         this.saveItems()
                     }
                     this.selectPreviousTab()
                     break
                 case 'ArrowRight':
-                    if (e.metaKey) {
+                    if (e.metaKey || e.ctrlKey) {
                         this.selectedItem.pinned = true
                         this.saveItems()
                     }
